@@ -6,7 +6,14 @@ import Comment from "../model/comment";
 
 export const getHistory = async (req, res) => {
     try {
-        const history = await History.find()
+        // Lấy userId từ query params hoặc req.user (nếu có middleware auth)
+        const userId = req.query.userId || req.user?._id;
+
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        const history = await History.find({ user: userId })
             .populate("track")
             .sort({ listenedAt: -1 })
             .limit(5);
