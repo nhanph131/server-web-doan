@@ -66,7 +66,7 @@ songRouter.post("/upload", uploadAudio.array("files", 10), uploadSongs);
 songRouter.post("/songs/:id/cover", uploadImage.single("cover"), updateCover);
 songRouter.put("/songs/:id", updateSongInfo);
 songRouter.post("/songs", addSong); 
-router.post('/songs', async (req, res) => {
+songRouter.post('/songs', async (req, res) => {
   try {
     const newSong = new Song(req.body);
     // Lưu ý: req.body cần chứa: title, description, imgUrl, trackUrl...
@@ -79,7 +79,7 @@ router.post('/songs', async (req, res) => {
 });
 
 // 2. UPDATE SONG (Sửa thông tin bài hát)
-router.put('/songs/:id', async (req, res) => {
+songRouter.put('/songs/:id', async (req, res) => {
   try {
     const updatedSong = await Song.findByIdAndUpdate(
       req.params.id,
@@ -93,7 +93,7 @@ router.put('/songs/:id', async (req, res) => {
 });
 
 // 3. DELETE SONG (Xóa bài hát)
-router.delete('/songs/:id', async (req, res) => {
+songRouter.delete('/songs/:id', async (req, res) => {
   try {
     await Song.findByIdAndUpdate(req.params.id, { isDeleted: true });
     res.json({ message: "Song deleted successfully" });
