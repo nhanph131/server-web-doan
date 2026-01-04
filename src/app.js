@@ -32,7 +32,7 @@ app.use('/api', searchRouter);
 app.use("/api", userRouter);
 
 // Static files
-app.use('/track', express.static(path.join(__dirname, '../filemp3')));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/filemp3', express.static(path.join(__dirname, '../filemp3')));
+app.use('/images', express.static(path.join(__dirname, '../images')));
 
 export const viteNodeApp = app;

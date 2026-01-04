@@ -5,8 +5,9 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import Song from "../model/song.js"; // <--- Thêm cái này để chạy chức năng Delete
 
-// Import Controller (BỎ searchSongs)
+// Import Controller
 import { 
     getSongs, 
     getSongById, 
@@ -20,18 +21,19 @@ import {
 
 const songRouter = express.Router();
 
-// ... (Giữ nguyên phần cấu hình Multer Audio & Image y hệt cũ) ...
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Config lưu file MP3
+// --- 1. CONFIG MULTER: LƯU NHẠC (Vào folder filemp3) ---
 const audioStorage = multer.diskStorage({
   destination: (req, file, cb) => {
+    // __dirname đang là src/router -> lùi 2 cấp ra root -> vào filemp3
     const dir = path.join(__dirname, "../../filemp3"); 
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
   filename: (req, file, cb) => {
+    // Đặt tên: timestamp-random.mp3
     const ext = path.extname(file.originalname);
     const name = Date.now() + "-" + Math.round(Math.random() * 1e9) + ext;
     cb(null, name);
@@ -39,10 +41,11 @@ const audioStorage = multer.diskStorage({
 });
 const uploadAudio = multer({ storage: audioStorage });
 
-// Config lưu ảnh Cover
+// --- 2. CONFIG MULTER: LƯU ẢNH (Vào folder images) ---
+// Sửa lại đường dẫn này cho khớp với app.js (app.use('/images'...))
 const imageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.join(__dirname, "../../uploads/covers");
+    const dir = path.join(__dirname, "../../images"); // <--- QUAN TRỌNG: Lưu vào folder images
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -54,47 +57,32 @@ const imageStorage = multer.diskStorage({
 });
 const uploadImage = multer({ storage: imageStorage });
 
-// --- ROUTES ---
+// --- ROUTES (API) ---
+
+// 1. Lấy dữ liệu (GET)
 songRouter.get("/songs", getSongs);
 songRouter.get("/song/:id", getSongById);
 songRouter.get("/song/:id/comments", getCommentsBySongId);
 songRouter.get("/songs/home", getHomeData); 
 
-// ❌ ĐÃ XÓA ROUTE SEARCH Ở ĐÂY ĐỂ CHUYỂN SANG searchRouter
-
+// 2. Upload & Thêm mới (POST)
+// Upload nhiều file nhạc
 songRouter.post("/upload", uploadAudio.array("files", 10), uploadSongs);
+
+// Upload ảnh bìa cho 1 bài hát cụ thể
 songRouter.post("/songs/:id/cover", uploadImage.single("cover"), updateCover);
-songRouter.put("/songs/:id", updateSongInfo);
+
+// Thêm bài hát (Dùng Controller addSong, đã xóa đoạn code trùng lặp bên dưới)
 songRouter.post("/songs", addSong); 
-songRouter.post('/songs', async (req, res) => {
-  try {
-    const newSong = new Song(req.body);
-    // Lưu ý: req.body cần chứa: title, description, imgUrl, trackUrl...
-    // và uploader (ID của admin đang đăng nhập)
-    await newSong.save();
-    res.status(201).json(newSong);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
-// 2. UPDATE SONG (Sửa thông tin bài hát)
-songRouter.put('/songs/:id', async (req, res) => {
-  try {
-    const updatedSong = await Song.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    res.json(updatedSong);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// 3. Cập nhật (PUT)
+songRouter.put("/songs/:id", updateSongInfo);
 
-// 3. DELETE SONG (Xóa bài hát)
+// 4. Xóa bài hát (DELETE)
+// Vì chưa có trong controller import nên giữ lại logic inline này
 songRouter.delete('/songs/:id', async (req, res) => {
   try {
+    // Xóa mềm (Soft delete)
     await Song.findByIdAndUpdate(req.params.id, { isDeleted: true });
     res.json({ message: "Song deleted successfully" });
   } catch (err) {
