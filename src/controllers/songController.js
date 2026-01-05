@@ -209,25 +209,30 @@ export const uploadSongs = async (req, res) => {
             return res.status(400).json({ message: "Không có file nào được tải lên" });
 
         const songs = [];
-        // TODO: Sau này có Auth thì thay bằng req.user._id
-        const fakeUserId = "693d8f6d53bc79c243c10737"; 
+        
+        // --- SỬA 1: Logic lấy User ID ---
+        // Nếu đã đăng nhập (có req.user) thì lấy ID thật, nếu không thì dùng ID giả
+        const userId = req.user && req.user._id ? req.user._id : "693d8f6d53bc79c243c10737"; 
 
         for (const f of req.files) {
             const baseName = f.originalname.replace(/\.[^/.]+$/, "");
             
-            // --- QUAN TRỌNG: Thêm tiền tố /filemp3/ vào DB để Frontend play được ---
-            const trackPath = `/filemp3/${f.filename}`;
+            // --- SỬA 2: Đổi /filemp3/ thành /track/ ---
+            // Vì app.js khai báo: app.use('/track', express.static...)
+            const trackPath = `/track/${f.filename}`;
 
             const newSong = await Song.create({
                 title: baseName,
-                title_normalized: normalizeText(baseName),
+                // Đảm bảo bạn có hàm normalizeText, nếu không thì dùng baseName tạm
+                title_normalized: typeof normalizeText === 'function' ? normalizeText(baseName) : baseName.toLowerCase(),
                 description: "Unknown Artist",
                 category: "General",
                 imgUrl: "", 
-                trackUrl: trackPath, // Lưu đường dẫn đầy đủ (/filemp3/...)
-                uploader: fakeUserId,
+                trackUrl: trackPath, // ✅ Lưu đúng đường dẫn này thì Frontend mới play được
+                uploader: userId,
                 countLike: 0,
-                countPlay: 0
+                countPlay: 0,
+                duration: 0 // Nên thêm trường này (mặc định 0), sau này update sau
             });
             songs.push(newSong);
         }
@@ -238,6 +243,7 @@ export const uploadSongs = async (req, res) => {
             data: songs 
         });
     } catch (error) {
+        console.error("Upload Error:", error); // Log ra console server để dễ debug
         res.status(500).json({
             statusCode: 500,
             message: error.message,
@@ -245,7 +251,6 @@ export const uploadSongs = async (req, res) => {
         });
     }
 };
-
 // 3. Update Cover
 export const updateCover = async (req, res) => {
     try {
