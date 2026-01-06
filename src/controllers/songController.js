@@ -265,7 +265,7 @@ export const updateCover = async (req, res) => {
         if (!req.file) return res.status(400).json({ message: "Thiếu file ảnh" });
         
         // --- QUAN TRỌNG: Lưu vào folder images để Frontend hiển thị được ---
-        const imgPath = `/images/${req.file.filename}`;
+        const imgPath = `/images/imageTrack${req.file.filename}`;
 
         const song = await Song.findByIdAndUpdate(
             req.params.id,

@@ -47,7 +47,7 @@ const uploadAudio = multer({ storage: audioStorage });
 // B. Lưu ảnh -> vào folder 'images' (Khớp với app.js)
 const imageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.join(__dirname, "../../images"); 
+    const dir = path.join(__dirname, "../../images/imageTrack"); 
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
