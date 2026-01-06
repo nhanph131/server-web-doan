@@ -45,7 +45,7 @@ export const followUser = async (req, res) => {
   }
 };
 
-// ================= GET FOLLOWERS =================
+// ================= GET FOLLOWERS (Private) =================
 export const getFollowers = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -56,7 +56,7 @@ export const getFollowers = async (req, res) => {
   }
 };
 
-// ================= GET FOLLOWING =================
+// ================= GET FOLLOWING (Private) =================
 export const getFollowing = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -67,13 +67,35 @@ export const getFollowing = async (req, res) => {
   }
 };
 
-// ================= CHECK STATUS =================
+// ================= CHECK STATUS (Private) =================
 export const checkFollowStatus = async (req, res) => {
   try {
     const { userId } = req.params;
     const currentUserId = req.user.userId || req.user.id;
     const follow = await Follow.findOne({ follower: currentUserId, following: userId });
     res.status(200).json({ isFollowing: !!follow });
+  } catch (error) {
+    res.status(500).json({ statusCode: 500, message: error.message });
+  }
+};
+
+// ================= GET FOLLOWERS (Public) =================
+export const getPublicFollowers = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const count = await Follow.countDocuments({ following: userId });
+    res.status(200).json({ followers: count });
+  } catch (error) {
+    res.status(500).json({ statusCode: 500, message: error.message });
+  }
+};
+
+// ================= GET FOLLOWING (Public) =================
+export const getPublicFollowing = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const count = await Follow.countDocuments({ follower: userId });
+    res.status(200).json({ following: count });
   } catch (error) {
     res.status(500).json({ statusCode: 500, message: error.message });
   }
