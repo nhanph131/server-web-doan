@@ -292,7 +292,7 @@ export const uploadSongs = async (req, res) => {
                 description: artistName, 
                 description_normalized: descNorm, 
 
-                category: "General",
+                category: "Pop",
                 imgUrl: "", 
 
                 trackUrl: trackPath, 
