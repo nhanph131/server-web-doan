@@ -5,7 +5,7 @@ export const getListeningHistory = async (req, res) => {
   try {
     // 1. Lấy ID người dùng từ req.user (được gán từ middleware xác thực token)
     // Nếu chưa có middleware, bạn cần đảm bảo req.user._id tồn tại
-    const userId = req.user?._id; 
+    const userId = req.user?._id || req.user?.id; 
 
     if (!userId) {
         return res.status(401).json({ message: "Chưa xác thực người dùng" });
@@ -68,5 +68,47 @@ export const clearUserHistory = async (req, res) => {
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+};
+
+export const addSongToHistory = async (req, res) => {
+    try {
+        const userId = req.user?._id || req.user?.id;
+        const { songId } = req.params;
+
+        if (!userId) {
+            return res.status(401).json({ message: "Chưa xác thực người dùng" });
+        }
+
+        if (!songId) {
+            return res.status(400).json({ message: "Thiếu ID bài hát" });
+        }
+
+        // Kiểm tra xem bài hát đã có trong lịch sử chưa
+        let history = await History.findOne({ user: userId, track: songId });
+
+        if (history) {
+            // Nếu đã có -> Update lại thời gian nghe và ensuring isDeleted = false
+            history.listenedAt = new Date();
+            history.isDeleted = false;
+            await history.save();
+        } else {
+            // Nếu chưa có -> Tạo mới
+            history = new History({
+                user: userId,
+                track: songId,
+                listenedAt: new Date()
+            });
+            await history.save();
+        }
+
+        return res.status(200).json({
+            message: "Đã cập nhật lịch sử nghe",
+            data: history
+        });
+
+    } catch (error) {
+        console.error("LỖI ADD HISTORY:", error);
+        return res.status(500).json({ message: "Lỗi Server khi thêm lịch sử" });
     }
 };

@@ -8,7 +8,7 @@ import path from "path";
 
 export const getSongs = async (req, res) => {
     try {
-        const data = await Song.find().populate("uploader", "_id name roles role");
+        const data = await Song.find().populate("uploader", "_id name roles role imgUrl");
         res.status(200).json({
             statusCode: 200,
             message: "Get All Track",
@@ -26,7 +26,11 @@ export const getSongs = async (req, res) => {
 export const getSongById = async (req, res) => {
     try {
         const { id } = req.params;
-        const data = await Song.findById(id).populate("uploader", "_id name roles role");
+        const data = await Song.findByIdAndUpdate(
+            id,
+            { $inc: { countPlay: 1 } },
+            { new: true }
+        ).populate("uploader", "_id name roles role imgUrl");
 
         if (!data) {
             return res.status(404).json({
@@ -185,6 +189,45 @@ export const unlikeSong = async (req, res) => {
     });
   }
 };
+
+// Check if song is liked by user
+export const checkSongLikeStatus = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        const { id } = req.params;
+
+        if (!userId) return res.status(401).json({
+            statusCode: 401,
+            message: "Unauthorized",
+            data: null
+        });
+
+        if (!id) return res.status(400).json({
+            statusCode: 400,
+            message: "Song ID is required",
+            data: null
+        });
+
+        const favorite = await Favorite.findOne({ user: userId, track: id });
+
+        // Check if favorite exists and is not deleted
+        const isLiked = !!(favorite && !favorite.isDeleted);
+
+        return res.status(200).json({
+            statusCode: 200,
+            message: "Success",
+            data: { liked: isLiked }
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+            statusCode: 500,
+            message: err.message,
+            data: null
+        });
+    }
+};
+
 
 // ============================================================
 // 🔽 PHẦN CODE MỚI (UPLOAD, UPDATE, SEARCH)

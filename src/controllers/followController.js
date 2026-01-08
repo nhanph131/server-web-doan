@@ -4,8 +4,8 @@ import User from "../model/user.js";
 // Toggle follow: Follow if not following, Unfollow if already following
 export const followUser = async (req, res) => {
     try {
-        const { followingId } = req.body;
-        const followerId = req.user?.id;
+        const { followingId } = req.params;
+        const followerId = req.user?.id || req.user?._id;
 
         if (followingId === followerId) {
             return res.status(400).json({
@@ -96,7 +96,7 @@ export const getFollowing = async (req, res) => {
 export const checkFollowStatus = async (req, res) => {
     try {
         const { userId } = req.params;
-        const currentUserId = req.user.userId;
+        const currentUserId = req.user?.id || req.user?._id;
 
         const follow = await Follow.findOne({ follower: currentUserId, following: userId });
 
