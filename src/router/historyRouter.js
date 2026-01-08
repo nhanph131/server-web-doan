@@ -1,10 +1,13 @@
 import express from "express";
-import { clearUserHistory, getListeningHistory } from "../controllers/historyController.js";
+import { clearUserHistory, getListeningHistory, addSongToHistory } from "../controllers/historyController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 
 const historyRouter = express.Router();
 
-historyRouter.get("/history", getListeningHistory);
+historyRouter.get("/history", verifyToken, getListeningHistory);
+
+// Add song to history
+historyRouter.post("/history/add/:songId", verifyToken, addSongToHistory);
 
 // Clear authenticated user's history (soft delete)
 historyRouter.delete("/history/clear", verifyToken, clearUserHistory);

@@ -10,7 +10,8 @@ import {
     updateCover,
     updateSongInfo,
     getSongsByUploader,
-    deleteSong
+    deleteSong,
+    checkSongLikeStatus
 } from "../controllers/songController.js";
 import { getHomeData } from "../controllers/homeController.js"; 
 import { verifyToken } from "../middleware/authMiddleware.js";
@@ -65,9 +66,10 @@ const uploadImage = multer({ storage: imageStorage });
 // --- GET Routes ---
 songRouter.get("/songs", getSongs);
 songRouter.get("/song/:id", getSongById);
-songRouter.get("/songs/home", getHomeData); 
+songRouter.get("/songs/home", getHomeData);
 songRouter.post("/song/:id/like", verifyToken, likeSong);
 songRouter.delete("/song/:id/like", verifyToken, unlikeSong);
+songRouter.get("/song/:id/like/status", verifyToken, checkSongLikeStatus);
 // songRouter.get("/song/:slug", (req, res) => {
 //     console.log("slug", req.params.slug);
     

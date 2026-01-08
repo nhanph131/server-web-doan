@@ -3,9 +3,9 @@ import User from "../model/user.js";
 
 // ================= TOGGLE FOLLOW =================
 export const followUser = async (req, res) => {
-  try {
-    const { followingId } = req.body;
-    const followerId = req.user.userId || req.user.id;
+    try {
+        const { followingId } = req.params;
+        const followerId = req.user?.id || req.user?._id;
 
     if (!followerId) {
       return res.status(401).json({ statusCode: 401, message: "Unauthorized" });
@@ -48,7 +48,7 @@ export const followUser = async (req, res) => {
 // ================= GET FOLLOWERS (Private) =================
 export const getFollowers = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user?.id || req.user?._id;
     const followers = await Follow.find({ following: userId }).populate("follower", "name imgUrl");
     res.status(200).json(followers);
   } catch (error) {
@@ -59,7 +59,7 @@ export const getFollowers = async (req, res) => {
 // ================= GET FOLLOWING (Private) =================
 export const getFollowing = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user?.id || req.user?._id;
     const following = await Follow.find({ follower: userId }).populate("following", "name imgUrl");
     res.status(200).json({ following, count: following.length });
   } catch (error) {
@@ -69,14 +69,25 @@ export const getFollowing = async (req, res) => {
 
 // ================= CHECK STATUS (Private) =================
 export const checkFollowStatus = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const currentUserId = req.user.userId || req.user.id;
-    const follow = await Follow.findOne({ follower: currentUserId, following: userId });
-    res.status(200).json({ isFollowing: !!follow });
-  } catch (error) {
-    res.status(500).json({ statusCode: 500, message: error.message });
-  }
+    try {
+        const { userId } = req.params;
+        const currentUserId = req.user?.id || req.user?._id;
+
+        const follow = await Follow.findOne({ follower: currentUserId, following: userId });
+
+        res.status(200).json({
+            statusCode: 200,
+            message: "Check follow status successfully",
+            data: { isFollowing: !!follow }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            statusCode: 500,
+            message: error.message,
+            data: null
+        });
+    }
 };
 
 // ================= GET FOLLOWERS (Public) =================

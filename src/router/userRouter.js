@@ -31,7 +31,7 @@ router.get("/stats", verifyToken, getUserStats);
 router.get("/likes", verifyToken, getUserLikedSongs);
 router.get("/playlists", verifyToken, getUserPlaylists);
 router.get("/history", verifyToken, getUserHistory);
-router.get("/public/:id", getPublicUser);
+router.get("/user/public/:id", getPublicUser);
 
 
 // 3. Config Multer (Để upload Avatar)
