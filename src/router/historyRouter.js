@@ -4,7 +4,7 @@ import { verifyToken } from "../middleware/authMiddleware.js";
 
 const historyRouter = express.Router();
 
-historyRouter.get("/history", getListeningHistory);
+historyRouter.get("/history", verifyToken, getListeningHistory);
 
 // Add song to history
 historyRouter.post("/history/add/:songId", verifyToken, addSongToHistory);

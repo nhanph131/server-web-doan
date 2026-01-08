@@ -389,6 +389,8 @@ export const getUserHistory = async (req, res) => {
         likes: h.track.countLike,
         plays: h.track.countPlay,
         listenedAt: h.listenedAt,
+        countPlay: h.track.countPlay,
+        countLike: h.track.countLike,
         liked: likedSet.has(String(h.track._id))
       }));
 

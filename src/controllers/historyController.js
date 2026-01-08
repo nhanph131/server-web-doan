@@ -5,7 +5,7 @@ export const getListeningHistory = async (req, res) => {
   try {
     // 1. Lấy ID người dùng từ req.user (được gán từ middleware xác thực token)
     // Nếu chưa có middleware, bạn cần đảm bảo req.user._id tồn tại
-    const userId = req.user?._id || req.user?.id; 
+    const userId = req.user?._id || req.user?.id;
 
     if (!userId) {
         return res.status(401).json({ message: "Chưa xác thực người dùng" });
