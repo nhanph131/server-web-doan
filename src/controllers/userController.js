@@ -123,7 +123,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const accessToken = jwt.sign({ id: user._id, username: user.username, role: user.role }, secret, { expiresIn: '1h' });
+    const accessToken = jwt.sign({ id: user._id, username: user.username, role: user.role }, secret, { expiresIn: '1d' });
 
     return res.status(200).json({
       statusCode: 200,

@@ -1,8 +1,8 @@
 // Viet cac phuong thuc get, post, put, delete
-import Song from "../model/song";
-import User from "../model/user"; // Import User model for population
-import Comment from "../model/comment";
-import Favorite from "../model/favorite";
+import Song from "../model/song.js";
+import User from "../model/user.js"; // Import User model for population
+import Comment from "../model/comment.js";
+import Favorite from "../model/favorite.js";
 import fs from "fs";
 import path from "path";
 

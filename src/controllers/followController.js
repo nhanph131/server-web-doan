@@ -49,7 +49,7 @@ export const followUser = async (req, res) => {
 export const getFollowers = async (req, res) => {
   try {
     const userId = req.user?.id || req.user?._id;
-    const followers = await Follow.find({ following: userId }).populate("follower", "name imgUrl");
+      const followers = await Follow.find({ following: userId }).populate("follower", "name imgUrl username");
     res.status(200).json(followers);
   } catch (error) {
     res.status(500).json({ statusCode: 500, message: error.message });
@@ -60,7 +60,7 @@ export const getFollowers = async (req, res) => {
 export const getFollowing = async (req, res) => {
   try {
     const userId = req.user?.id || req.user?._id;
-    const following = await Follow.find({ follower: userId }).populate("following", "name imgUrl");
+      const following = await Follow.find({ follower: userId }).populate("following", "name imgUrl username");
     res.status(200).json({ following, count: following.length });
   } catch (error) {
     res.status(500).json({ statusCode: 500, message: error.message });

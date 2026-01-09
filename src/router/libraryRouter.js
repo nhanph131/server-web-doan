@@ -1,6 +1,6 @@
 import express from "express";
-import { verifyToken } from "../middleware/authMiddleware";
-import { createPlaylist, getPlaylistTracks, updatePlaylistCover, updatePlaylist, deletePlaylist, addTrackToPlaylist, removeTrackFromPlaylist } from "../controllers/libraryController";
+import { verifyToken } from "../middleware/authMiddleware.js";
+import { createPlaylist, getPlaylistTracks, updatePlaylistCover, updatePlaylist, deletePlaylist, addTrackToPlaylist, removeTrackFromPlaylist } from "../controllers/libraryController.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";

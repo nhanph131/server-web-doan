@@ -6,3 +6,4 @@ filemp3
 images/*
 !images/imageTrack/
 !images/imageTrack/.gitkeep
+.env

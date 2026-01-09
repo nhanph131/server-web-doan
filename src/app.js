@@ -29,6 +29,8 @@ app.use(express.json());
 // Connect to MongoDB
 connectDB(process.env.MONGO_URI);
 
+app.use(cors());
+
 // === KHAI BÁO ROUTERS ===
 app.use("/api", songRouter);
 app.use("/api", homeRouter);
@@ -50,4 +52,9 @@ app.use('/track', express.static(path.join(__dirname, '../filemp3')));
 app.use('/images', express.static(path.join(__dirname, '../images')));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-export const viteNodeApp = app;
+// 👉 Chỉ listen khi chạy production (Render)
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

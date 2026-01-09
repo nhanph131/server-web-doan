@@ -1,5 +1,5 @@
-import Playlist from "../model/playlist";
-import Song from "../model/song";
+import Playlist from "../model/playlist.js";
+import Song from "../model/song.js";
 import Favorite from "../model/favorite.js";
 import path from "path";
 
